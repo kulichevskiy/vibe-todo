@@ -33,6 +33,17 @@ def cmd_list(args):
         print(f"{i}. {t}")
 
 
+def cmd_delete(args):
+    tasks = load_tasks()
+    idx = args.index - 1
+    if 0 <= idx < len(tasks):
+        removed = tasks.pop(idx)
+        save_tasks(tasks)
+        print(f"Deleted: {removed}")
+    else:
+        print(f"No task with index {args.index}")
+
+
 def main():
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -43,6 +54,10 @@ def main():
 
     p_list = sub.add_parser("list")
     p_list.set_defaults(func=cmd_list)
+
+    p_del = sub.add_parser("delete")
+    p_del.add_argument("index", type=int)
+    p_del.set_defaults(func=cmd_delete)
 
     args = parser.parse_args()
     args.func(args)
