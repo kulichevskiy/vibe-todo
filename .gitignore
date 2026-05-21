@@ -1,0 +1,7 @@
+tasks.json
+tasks.txt
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store

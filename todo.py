@@ -1,25 +1,25 @@
 import argparse
+import json
 import os
 
-TASKS_FILE = "tasks.txt"
+TASKS_FILE = "tasks.json"
 
 
 def load_tasks():
     if not os.path.exists(TASKS_FILE):
         return []
     with open(TASKS_FILE) as f:
-        return [line.strip() for line in f if line.strip()]
+        return json.load(f)
 
 
 def save_tasks(tasks):
     with open(TASKS_FILE, "w") as f:
-        for t in tasks:
-            f.write(t + "\n")
+        json.dump(tasks, f, indent=2, ensure_ascii=False)
 
 
 def cmd_add(args):
     tasks = load_tasks()
-    tasks.append(args.text)
+    tasks.append({"text": args.text})
     save_tasks(tasks)
     print(f"Added: {args.text}")
 
@@ -30,7 +30,7 @@ def cmd_list(args):
         print("No tasks")
         return
     for i, t in enumerate(tasks, 1):
-        print(f"{i}. {t}")
+        print(f"{i}. {t['text']}")
 
 
 def cmd_delete(args):
@@ -39,7 +39,7 @@ def cmd_delete(args):
     if 0 <= idx < len(tasks):
         removed = tasks.pop(idx)
         save_tasks(tasks)
-        print(f"Deleted: {removed}")
+        print(f"Deleted: {removed['text']}")
     else:
         print(f"No task with index {args.index}")
 
