@@ -19,7 +19,7 @@ def save_tasks(tasks):
 
 def cmd_add(args):
     tasks = load_tasks()
-    tasks.append({"text": args.text})
+    tasks.append({"text": args.text, "priority": args.priority})
     save_tasks(tasks)
     print(f"Added: {args.text}")
 
@@ -30,7 +30,7 @@ def cmd_list(args):
         print("No tasks")
         return
     for i, t in enumerate(tasks, 1):
-        print(f"{i}. {t['text']}")
+        print(f"{i}. [{t['priority']}] {t['text']}")
 
 
 def cmd_delete(args):
@@ -50,6 +50,7 @@ def main():
 
     p_add = sub.add_parser("add")
     p_add.add_argument("text")
+    p_add.add_argument("--priority", choices=["high", "medium", "low"], default="medium")
     p_add.set_defaults(func=cmd_add)
 
     p_list = sub.add_parser("list")
