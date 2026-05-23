@@ -4,6 +4,8 @@ import os
 
 TASKS_FILE = "tasks.json"
 
+PRIORITY_MARKS = {"high": "!!!", "medium": " ··", "low": "  ·"}
+
 
 def load_tasks():
     if not os.path.exists(TASKS_FILE):
@@ -21,16 +23,19 @@ def cmd_add(args):
     tasks = load_tasks()
     tasks.append({"text": args.text, "priority": args.priority})
     save_tasks(tasks)
-    print(f"Added: {args.text}")
+    print(f"  + Added: {args.text}")
 
 
 def cmd_list(args):
     tasks = load_tasks()
     if not tasks:
-        print("No tasks")
+        print("  (no tasks)")
         return
+    print()
     for i, t in enumerate(tasks, 1):
-        print(f"{i}. [{t['priority']}] {t['text']}")
+        mark = PRIORITY_MARKS[t["priority"]]
+        print(f"  {i:>2}. {mark}  {t['text']}")
+    print()
 
 
 def cmd_delete(args):
@@ -39,9 +44,9 @@ def cmd_delete(args):
     if 0 <= idx < len(tasks):
         removed = tasks.pop(idx)
         save_tasks(tasks)
-        print(f"Deleted: {removed['text']}")
+        print(f"  - Deleted: {removed['text']}")
     else:
-        print(f"No task with index {args.index}")
+        print(f"  ! No task with index {args.index}")
 
 
 def main():
