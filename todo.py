@@ -7,43 +7,56 @@ TASKS_FILE = "tasks.json"
 PRIORITY_MARKS = {"high": "!!!", "medium": " ··", "low": "  ·"}
 
 
-def load_tasks():
-    if not os.path.exists(TASKS_FILE):
-        return []
-    with open(TASKS_FILE) as f:
-        return json.load(f)
+class TaskStore:
+    def __init__(self, path):
+        self.path = path
+        self.tasks = self._load()
 
+    def _load(self):
+        if not os.path.exists(self.path):
+            return []
+        with open(self.path) as f:
+            return json.load(f)
 
-def save_tasks(tasks):
-    with open(TASKS_FILE, "w") as f:
-        json.dump(tasks, f, indent=2, ensure_ascii=False)
+    def save(self):
+        with open(self.path, "w") as f:
+            json.dump(self.tasks, f, indent=2, ensure_ascii=False)
+
+    def add(self, text, priority):
+        self.tasks.append({"text": text, "priority": priority})
+        self.save()
+
+    def delete(self, index):
+        idx = index - 1
+        if 0 <= idx < len(self.tasks):
+            removed = self.tasks.pop(idx)
+            self.save()
+            return removed
+        return None
 
 
 def cmd_add(args):
-    tasks = load_tasks()
-    tasks.append({"text": args.text, "priority": args.priority})
-    save_tasks(tasks)
+    store = TaskStore(TASKS_FILE)
+    store.add(args.text, args.priority)
     print(f"  + Added: {args.text}")
 
 
 def cmd_list(args):
-    tasks = load_tasks()
-    if not tasks:
+    store = TaskStore(TASKS_FILE)
+    if not store.tasks:
         print("  (no tasks)")
         return
     print()
-    for i, t in enumerate(tasks, 1):
+    for i, t in enumerate(store.tasks, 1):
         mark = PRIORITY_MARKS[t["priority"]]
         print(f"  {i:>2}. {mark}  {t['text']}")
     print()
 
 
 def cmd_delete(args):
-    tasks = load_tasks()
-    idx = args.index - 1
-    if 0 <= idx < len(tasks):
-        removed = tasks.pop(idx)
-        save_tasks(tasks)
+    store = TaskStore(TASKS_FILE)
+    removed = store.delete(args.index)
+    if removed:
         print(f"  - Deleted: {removed['text']}")
     else:
         print(f"  ! No task with index {args.index}")
