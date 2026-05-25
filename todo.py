@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+from datetime import datetime
 
 TASKS_FILE = "tasks.json"
 
@@ -22,8 +23,8 @@ class TaskStore:
         with open(self.path, "w") as f:
             json.dump(self.tasks, f, indent=2, ensure_ascii=False)
 
-    def add(self, text, priority):
-        self.tasks.append({"text": text, "priority": priority})
+    def add(self, text, priority, due_date):
+        self.tasks.append({"text": text, "priority": priority, "due_date": due_date})
         self.save()
 
     def delete(self, index):
@@ -37,7 +38,7 @@ class TaskStore:
 
 def cmd_add(args):
     store = TaskStore(TASKS_FILE)
-    store.add(args.text, args.priority)
+    store.add(args.text, args.priority, args.due)
     print(f"  + Added: {args.text}")
 
 
@@ -49,7 +50,8 @@ def cmd_list(args):
     print()
     for i, t in enumerate(store.tasks, 1):
         mark = PRIORITY_MARKS[t["priority"]]
-        print(f"  {i:>2}. {mark}  {t['text']}")
+        due = datetime.strptime(t["due_date"], "%Y-%m-%d").strftime("%d.%m")
+        print(f"  {i:>2}. {mark}  {t['text']:<30}  ⏰ {due}")
     print()
 
 
@@ -69,6 +71,7 @@ def main():
     p_add = sub.add_parser("add")
     p_add.add_argument("text")
     p_add.add_argument("--priority", choices=["high", "medium", "low"], default="medium")
+    p_add.add_argument("--due", default=None, help="due date in YYYY-MM-DD")
     p_add.set_defaults(func=cmd_add)
 
     p_list = sub.add_parser("list")
