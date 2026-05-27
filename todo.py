@@ -36,6 +36,12 @@ class TaskStore:
         return None
 
 
+def _format_due(raw):
+    if not raw:
+        return ""
+    return datetime.strptime(raw, "%Y-%m-%d").strftime("%d.%m")
+
+
 def cmd_add(args):
     store = TaskStore(TASKS_FILE)
     store.add_item(args.text, args.priority, args.due)
@@ -50,8 +56,9 @@ def cmd_list(args):
     print()
     for position, item in enumerate(store.todo_items, 1):
         priority_mark = PRIORITY_MARKS[item["priority"]]
-        due_formatted = datetime.strptime(item["due_date"], "%Y-%m-%d").strftime("%d.%m")
-        print(f"  {position:>2}. {priority_mark}  {item['title']:<30}  ⏰ {due_formatted}")
+        due_formatted = _format_due(item.get("due_date"))
+        suffix = f"  ⏰ {due_formatted}" if due_formatted else ""
+        print(f"  {position:>2}. {priority_mark}  {item['title']:<30}{suffix}")
     print()
 
 
