@@ -7,8 +7,6 @@ TASKS_FILE = "tasks.json"
 
 PRIORITY_MARKS = {"high": "!!!", "medium": " ··", "low": "  ·"}
 
-print('SEARCH')
-
 class TaskStore:
     def __init__(self, storage_path):
         self.storage_path = storage_path

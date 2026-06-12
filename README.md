@@ -1,4 +1,4 @@
-# vibe-todo
+# TODO-LIST
 
 Простой todo-CLI на Python. Учебный sandbox для лекции про git.
 
